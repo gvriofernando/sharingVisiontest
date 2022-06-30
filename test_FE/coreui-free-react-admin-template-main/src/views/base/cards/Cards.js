@@ -35,7 +35,6 @@ const Cards = () => {
   }
 
   const changePages = (event, numPage) => {
-    console.log(event)
     setCurrentPage(numPage)
 
     const fetchPosts = async () => {

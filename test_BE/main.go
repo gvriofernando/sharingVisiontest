@@ -209,5 +209,50 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{})
 	})
 
+	router.GET("/articleKhusus/:status", func(c *gin.Context) {
+		status := c.Param("status")
+
+		var result gin.H
+		rows, err := db.Query("SELECT * FROM `posts` WHERE `Status` = '" + status + "';")
+		// err = row.Scan(&posts.ID, &posts.TITLE, &posts.CONTENT, &posts.CATEGORY, &posts.CREATED_DATE, &posts.UPDATED_DATE, &posts.STATUS)
+		if err != nil {
+			result = gin.H{
+				"message": "Error Query",
+			}
+		}
+
+		defer rows.Close()
+
+		var items []Posts
+		for rows.Next() {
+			var i Posts
+			if err := rows.Scan(
+				&i.ID,
+				&i.TITLE,
+				&i.CONTENT,
+				&i.CATEGORY,
+				&i.CREATED_DATE,
+				&i.UPDATED_DATE,
+				&i.STATUS,
+			); err != nil {
+				result = gin.H{
+					"message": "Error Query",
+				}
+			}
+			items = append(items, i)
+		}
+
+		if err != nil {
+			// If no results send null
+			result = gin.H{
+				"message": "Data Not Found",
+			}
+		} else {
+			result = gin.H{
+				"result": items,
+			}
+		}
+		c.JSON(http.StatusOK, result)
+	})
 	router.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
